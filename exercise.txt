@@ -58,3 +58,21 @@ db.Student.aggregate
         }
     ]
 )
+-
+
+
+
+
+db.Student.aggregate
+([
+    "$group":
+    {
+        "_id":
+        {
+            "Section": "$Section"
+        },
+        "TotalMarks": {
+            "$sum": "$Marks"
+        }
+    }
+])
