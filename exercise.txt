@@ -13,13 +13,47 @@ db.Student.insert({StudentName : "Soniya",Section : "D",Marks:20,Subject:["Engli
 --------
 
 
-db.student.aggregate
+db.Student.aggregate
 (
     [
         {
             "$match":
             {
                 "Section":"A"
+            }
+        }
+    ]
+)
+
+-------
+
+db.Student.aggregate
+(
+    [
+        {
+            "$match":
+            {
+               $and:[{"Section":"A"},{Marks:{"$gt":80}}]
+            }
+        }
+    ]
+)
+
+---------------
+
+db.Student.aggregate
+(
+    [
+        {
+            "$match":
+            {
+                "Section":"A"
+            }
+        },
+        {
+            "$project":
+            {
+                StudentName:1,Section:1,Marks:1
             }
         }
     ]
