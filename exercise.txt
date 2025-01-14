@@ -1,74 +1,9 @@
-db.createCollection( "people" , { 
-   validator: { $jsonSchema: { 
-      bsonType: "object", 
-      required: [ "name", "surname", "email" ], 
-      properties: { 
-         name: { 
-            bsonType: "string", 
-            description: "required and must be a string" }, 
-         surname: { 
-            bsonType: "string", 
-            description: "required and must be a string" }, 
-         email: { 
-            bsonType: "string", 
-            pattern: "^.+\@.+$", 
-            description: "required and must be a valid email address" }, 
-         year_of_birth: { 
-            bsonType: "int", 
-            minimum: 1900, 
-            maximum: 2018,
-            description: "the value must be in the range 1900-2018" }, 
-         gender: { 
-            enum: [ "M", "F" ], 
-            description: "can be only M or F" } 
-      }
-   }
-}})
-------
-
-
-db.createCollection( "people2" , {
-   validator: {
-     $jsonSchema: {
-        bsonType: "object",
-        additionalProperties: false,
- required: ["name","age"],
-        properties: {
-           _id : {
-              bsonType: "objectId" },
-           name: {
-              bsonType: "string",
-              description: "required and must be a string" },
-           age: {
-              bsonType: "int",
-              minimum: 0,
-              maximum: 100,
-              description: "required and must be in the range 0-100" }
-        }
-     }
-}})
-
------
-
-
-db.runCommand( { collMod: "people3", 
-   validator: { 
-      $jsonSchema : { 
-         bsonType: "object", 
-         required: [ "name", "surname", "gender" ], 
-         properties: { 
-            name: { 
-               bsonType: "string", 
-               description: "required and must be a string" }, 
-            surname: { 
-               bsonType: "string", 
-               description: "required and must be a string" }, 
-            gender: { 
-               enum: [ "M", "F" ], 
-               description: "required and must be M or F" } 
-         }
-       }
-}, 
-validationLevel: "moderate", 
-validationAction: "warn" 
-})
+db.indexdemo.insertMany([
+    {name:'ajay',age:30,email:'ajay@mail.com',ssn:3456},
+    {name:'suraj',age:32,email:'suraj@mail.com',ssn:3656},
+    {name:'preeti',age:30,email:'preeti@mail.com',ssn:1456},
+    {name:'anuj',age:33,email:'anuj@mail.com',ssn:9656}, 
+    {name:'manoj',age:30,email:',manoj@mail.com',ssn:5456},
+    {name:'sukanta',age:30,email:'sun@mail.com',ssn:2656},
+    {name:'ajay',age:33,email:'ajaynew@mail.com',ssn:6456}
+])
