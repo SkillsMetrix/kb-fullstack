@@ -24,3 +24,51 @@ db.createCollection( "people" , {
       }
    }
 }})
+------
+
+
+db.createCollection( "people2" , {
+   validator: {
+     $jsonSchema: {
+        bsonType: "object",
+        additionalProperties: false,
+ required: ["name","age"],
+        properties: {
+           _id : {
+              bsonType: "objectId" },
+           name: {
+              bsonType: "string",
+              description: "required and must be a string" },
+           age: {
+              bsonType: "int",
+              minimum: 0,
+              maximum: 100,
+              description: "required and must be in the range 0-100" }
+        }
+     }
+}})
+
+-----
+
+
+db.runCommand( { collMod: "people3", 
+   validator: { 
+      $jsonSchema : { 
+         bsonType: "object", 
+         required: [ "name", "surname", "gender" ], 
+         properties: { 
+            name: { 
+               bsonType: "string", 
+               description: "required and must be a string" }, 
+            surname: { 
+               bsonType: "string", 
+               description: "required and must be a string" }, 
+            gender: { 
+               enum: [ "M", "F" ], 
+               description: "required and must be M or F" } 
+         }
+       }
+}, 
+validationLevel: "moderate", 
+validationAction: "warn" 
+})
