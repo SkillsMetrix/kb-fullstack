@@ -1,4 +1,26 @@
-{ "Name" : "Balaji", "skills" : [ "Dancing", "Cooking", "Singing" ] }
-{ "Name" : "Ramesh", "skills" : [ "Cooking", "Singing" ] }
-{ "Name" : "Suresh", "skills" : [ "Dancing", "Singing" ] }
- 
+db.createCollection( "people" , { 
+   validator: { $jsonSchema: { 
+      bsonType: "object", 
+      required: [ "name", "surname", "email" ], 
+      properties: { 
+         name: { 
+            bsonType: "string", 
+            description: "required and must be a string" }, 
+         surname: { 
+            bsonType: "string", 
+            description: "required and must be a string" }, 
+         email: { 
+            bsonType: "string", 
+            pattern: "^.+\@.+$", 
+            description: "required and must be a valid email address" }, 
+         year_of_birth: { 
+            bsonType: "int", 
+            minimum: 1900, 
+            maximum: 2018,
+            description: "the value must be in the range 1900-2018" }, 
+         gender: { 
+            enum: [ "M", "F" ], 
+            description: "can be only M or F" } 
+      }
+   }
+}})
