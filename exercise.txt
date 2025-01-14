@@ -1,13 +1,4 @@
-db.student.insert({
-
-    stuid:101,stuname:"stu1",
-    course:{
-        courseName:"MCA",
-        duration:"3 years"
-    },
-    address:{
-        city:"pune",
-        state:"MH",
-        country:"IN"
-    }
-})
+{ "Name" : "Balaji", "skills" : [ "Dancing", "Cooking", "Singing" ] }
+{ "Name" : "Ramesh", "skills" : [ "Cooking", "Singing" ] }
+{ "Name" : "Suresh", "skills" : [ "Dancing", "Singing" ] }
+ 
