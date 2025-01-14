@@ -7,3 +7,20 @@ db.Student.insert({StudentName : "Preeti",Section : "C",Marks:80,Subject:["Hindi
 db.Student.insert({StudentName : "Anuj",Section : "C",Marks:50,Subject:["English"]})
 db.Student.insert({StudentName : "Palka",Section : "D",Marks:40,Subject:["Math"]})
 db.Student.insert({StudentName : "Soniya",Section : "D",Marks:20,Subject:["English","Math"]})
+
+
+
+--------
+
+
+db.student.aggregate
+(
+    [
+        {
+            "$match":
+            {
+                "Section":"A"
+            }
+        }
+    ]
+)
