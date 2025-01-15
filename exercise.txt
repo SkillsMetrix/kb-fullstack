@@ -1,22 +1,93 @@
-
+from fastapi import FastAPI, HTTPException, Response
+from random import randrange
+from typing import Optional
+from fastapi.params import Body
+from pydantic import BaseModel
+from fastapi import status
 import sqlite3
 
-connection_obj=sqlite3.connect('mytest.db')
+app = FastAPI()
 
-curser_obj=connection_obj.cursor()
+connection_obj=sqlite3.connect('mytest.db',check_same_thread=False)
+cursor_obj=connection_obj.cursor()
 
-curser_obj.execute("DROP TABLE IF EXISTS users")
+def findPost(id):
+    for p in my_post:
+        if p['id'] == id:
+            return p
 
-table =""" CREATE TABLE users (
-           Email VARCHAR(255)NOT NULL,
-           First_Name VARCHAR(255)NOT NULL,
-           Last_Name VARCHAR(255)NOT NULL
-           )""" 
-curser_obj.execute(table)
-curser_obj.execute('''INSERT INTO users VALUES('user@mail.com','admin','manager')''')
-print('data added')
-data=curser_obj.execute('''SELECT * FROM users''')
-for row in data:
-    print(row)
-connection_obj.commit()
-connection_obj.close()
+def findPost2(id):
+    for i,p in enumerate(my_post):
+         if p['id'] == id:
+            return i
+
+class Post(BaseModel):
+    Email: str
+    First_Name: str
+    Last_Name: str
+   
+
+
+my_post = [{"title": "demo title", "content": "demo content", "id": 101}]
+
+
+@app.get("/")
+def welcome():
+    return {"message": "Welcome to FastAPI...."}
+
+
+@app.get("/dummy")
+def dummyData():
+    return {"data": my_post}
+
+
+
+
+@app.post("/adduser", status_code=status.HTTP_201_CREATED)
+def postDataToArray(newPost: Post):
+
+    cursor_obj.execute(" " "INSERT INTO users(Email,First_Name,Last_Name)VALUES(?,?,?) RETURNING *  " " ",(
+        newPost.Email,newPost.First_Name,newPost.Last_Name
+    ))
+    np= cursor_obj.fetchone()
+    connection_obj.commit()
+    
+
+    return {"message": np}
+
+@app.get("/loaduser/{id}")
+def loadUser(id:int):
+    post=findPost(id)
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Given ID not found")
+    else:
+       return {"data":post}
+
+
+@app.get("/loadusernew/{id}")
+def loadUser(id:int,response:Response):
+    post=findPost(id)
+    if not post:
+        response.status_code=status.HTTP_404_NOT_FOUND
+        print(post)
+        return{"message":"ID not found"}
+    else:
+       return {"data":post}
+
+@app.delete("/deletepost/{id}",status_code=status.HTTP_204_NO_CONTENT)
+def deleteUserById(id:int):
+    index=findPost2(id)
+    if index == None:
+         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Given ID not found")
+    my_post.pop(index)
+    return{"Post Deleted":index}
+
+@app.put("/updatepost/{id}")
+def updateUserById(id:int,post:Post):
+    index=findPost2(id)
+    if index == None:
+         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Given ID not found")
+    post_dict=post.model_dump()
+    post_dict['id']=id
+    my_post[index]=post_dict
+    return{"Post updated":post_dict}
