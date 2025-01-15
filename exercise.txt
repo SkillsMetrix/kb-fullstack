@@ -10,8 +10,13 @@ curser_obj.execute("DROP TABLE IF EXISTS users")
 table =""" CREATE TABLE users (
            Email VARCHAR(255)NOT NULL,
            First_Name VARCHAR(255)NOT NULL,
-           Last_Name VARCHAR(255)NOT NULL,
-           Score INT
+           Last_Name VARCHAR(255)NOT NULL
            )""" 
 curser_obj.execute(table)
+curser_obj.execute('''INSERT INTO users VALUES('user@mail.com','admin','manager')''')
+print('data added')
+data=curser_obj.execute('''SELECT * FROM users''')
+for row in data:
+    print(row)
+connection_obj.commit()
 connection_obj.close()
