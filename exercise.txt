@@ -1,46 +1,25 @@
-from fastapi import FastAPI, HTTPException, Response,Depends
-from random import randrange
-from typing import Optional
-from fastapi.params import Body
-from sqlalchemy.orm import Session
-from fastapi import status
-import sqlite3
-from . import models,schemas
-from .database import engine,get_db
-
-models.Base.metadata.create_all(bind=engine)
-
-app = FastAPI()
-
-@app.get("/loadall")
-def loadall(db: Session=Depends(get_db)):
-    return {"status":"success"}
-
-@app.post("/addstudent", status_code=status.HTTP_201_CREATED)
-def addStudent(student:schemas.Student,db: Session=Depends(get_db)):
-    new_post=models.Student(**student.dict())
-    print(new_post)
-    db.add(new_post)
-    db.commit()
-    db.refresh(new_post)
-    return {"data": new_post}
-
-@app.get("/loadstudent")
-def loadPosts(db: Session=Depends(get_db)):
-    posts= db.query(models.Student).all()
-    print(posts)
-    return{"data":posts}
-
-@app.get("/loadstudent/{name}")
-def loadUser(name:str,db: Session=Depends(get_db)):
-    post=db.query(models.Student).filter(models.Student.name == name).first()
-    print(post)
-    return{"data":post}
+from pydantic import BaseModel
 
 
-    
+class StudentBase(BaseModel):
+    name: str
+    sclass: str
+    section: str
 
+class StudentCreate(StudentBase):
+    pass
 
+class Stu(StudentBase):
+    name: str
+    class Config:
+        orm_modev=True
 
+class UserCreate(BaseModel):
+    email: str
+    password: str
 
+class UserOut(BaseModel):
+    email: str
 
+class Config:
+    orm_modev=True
