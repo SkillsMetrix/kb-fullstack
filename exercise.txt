@@ -30,16 +30,11 @@ class Post(BaseModel):
 
 my_post = [{"title": "demo title", "content": "demo content", "id": 101}]
 
-
-@app.get("/")
-def welcome():
-    return {"message": "Welcome to FastAPI...."}
-
-
-@app.get("/dummy")
-def dummyData():
-    return {"data": my_post}
-
+@app.get("/loadposts")
+def loadPosts():
+    cursor_obj.execute('''SELECT * FROM users ''')
+    mypost=cursor_obj.fetchall()
+    return {"posts" : mypost}
 
 
 
@@ -55,24 +50,21 @@ def postDataToArray(newPost: Post):
 
     return {"message": np}
 
-@app.get("/loaduser/{id}")
-def loadUser(id:int):
-    post=findPost(id)
-    if not post:
+@app.get("/loaduser/{name}")
+def loadUser(name:str):
+    cursor_obj.execute(
+        " " " SELECT * FROM users where First_Name=?" " ",(str(name),))
+    test_post=cursor_obj.fetchone()
+    print(test_post)
+
+    if not test_post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Given ID not found")
     else:
-       return {"data":post}
+        return{"user found":test_post}
 
 
-@app.get("/loadusernew/{id}")
-def loadUser(id:int,response:Response):
-    post=findPost(id)
-    if not post:
-        response.status_code=status.HTTP_404_NOT_FOUND
-        print(post)
-        return{"message":"ID not found"}
-    else:
-       return {"data":post}
+
+
 
 @app.delete("/deletepost/{id}",status_code=status.HTTP_204_NO_CONTENT)
 def deleteUserById(id:int):
