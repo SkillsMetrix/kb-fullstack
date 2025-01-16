@@ -8,78 +8,84 @@ import sqlite3
 
 app = FastAPI()
 
-connection_obj=sqlite3.connect('mytest.db',check_same_thread=False)
-cursor_obj=connection_obj.cursor()
+connection_obj = sqlite3.connect('mytest.db', check_same_thread=False)
+cursor_obj = connection_obj.cursor()
+
 
 def findPost(id):
     for p in my_post:
         if p['id'] == id:
             return p
 
+
 def findPost2(id):
-    for i,p in enumerate(my_post):
-         if p['id'] == id:
+    for i, p in enumerate(my_post):
+        if p['id'] == id:
             return i
+
 
 class Post(BaseModel):
     Email: str
     First_Name: str
     Last_Name: str
-   
 
-
-my_post = [{"title": "demo title", "content": "demo content", "id": 101}]
 
 @app.get("/loadposts")
 def loadPosts():
     cursor_obj.execute('''SELECT * FROM users ''')
-    mypost=cursor_obj.fetchall()
-    return {"posts" : mypost}
-
+    mypost = cursor_obj.fetchall()
+    return {"posts": mypost}
 
 
 @app.post("/adduser", status_code=status.HTTP_201_CREATED)
 def postDataToArray(newPost: Post):
 
-    cursor_obj.execute(" " "INSERT INTO users(Email,First_Name,Last_Name)VALUES(?,?,?) RETURNING *  " " ",(
-        newPost.Email,newPost.First_Name,newPost.Last_Name
+    cursor_obj.execute(" " "INSERT INTO users(Email,First_Name,Last_Name)VALUES(?,?,?) RETURNING *  " " ", (
+        newPost.Email, newPost.First_Name, newPost.Last_Name
     ))
-    np= cursor_obj.fetchone()
+    np = cursor_obj.fetchone()
     connection_obj.commit()
-    
 
     return {"message": np}
 
+
 @app.get("/loaduser/{name}")
-def loadUser(name:str):
+def loadUser(name: str):
     cursor_obj.execute(
-        " " " SELECT * FROM users where First_Name=?" " ",(str(name),))
-    test_post=cursor_obj.fetchone()
+        " " " SELECT * FROM users where First_Name=?" " ", (str(name),))
+    test_post = cursor_obj.fetchone()
     print(test_post)
 
     if not test_post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Given ID not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Given ID not found")
     else:
-        return{"user found":test_post}
+        return {"user found": test_post}
 
 
+@app.delete("/deletepost/{name}", status_code=status.HTTP_204_NO_CONTENT)
+def deleteUserById(name: str):
+    cursor_obj.execute(
+        " " " delete FROM users where First_Name=?" " ", (str(name),))
+    test_post = cursor_obj.fetchone()
+    connection_obj.commit()
+
+    if not test_post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Given ID not found")
+
+    return {"Post Deleted": "user deleted"}
 
 
+@app.put("/updatepost/{name}")
+def updateUserById(name: str, post: Post):
+    cursor_obj.execute(
+        " " " update users set Last_name=?,Email=? where First_Name=? RETURNING * " " ", (
+            post.Last_Name, post.Email, str(name),))
+    test_post = cursor_obj.fetchone()
+    connection_obj.commit()
+    if test_post == None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Given ID not found")
 
-@app.delete("/deletepost/{id}",status_code=status.HTTP_204_NO_CONTENT)
-def deleteUserById(id:int):
-    index=findPost2(id)
-    if index == None:
-         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Given ID not found")
-    my_post.pop(index)
-    return{"Post Deleted":index}
-
-@app.put("/updatepost/{id}")
-def updateUserById(id:int,post:Post):
-    index=findPost2(id)
-    if index == None:
-         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Given ID not found")
-    post_dict=post.model_dump()
-    post_dict['id']=id
-    my_post[index]=post_dict
-    return{"Post updated":post_dict}
+    return {"Post updated": test_post}
