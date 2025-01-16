@@ -1,104 +1,32 @@
-from pydantic import BaseModel
 
 
-class StudentBase(BaseModel):
-    name: str
-    sclass: str
-    section: str
 
-class StudentCreate(StudentBase):
-    pass
+from passlib.context import CryptContext
+pwd_context=CryptContext(schemes=["bcrypt"],deprecated="auto")
 
-class Stu(StudentBase):
-    name: str
-    class Config:
-        orm_modev=True
 
-class UserCreate(BaseModel):
-    id: int
-    email: str
-    password: str
 
-class UserOut(BaseModel):
-    email: str
+def hash(password:str):
+    return pwd_context.hash(password)
 
-class Config:
-    orm_modev=True
-
-------------------
+-------------
 
 
 from fastapi import FastAPI, HTTPException, Response, Depends, status, APIRouter
 from sqlalchemy.orm import Session
-from typing import Optional, List
-
-from .. import models, schemas
+ 
+from .. import models, schemas,utils
 from .. database import engine, get_db
 
 router = APIRouter(
-    tags=["students"]
+    tags=["users"]
 )
 
 
-@router.get("/loadall")
-def loadall(db: Session = Depends(get_db)):
-    return {"status": "success"}
-
-
-@router.post("/addstudent", status_code=status.HTTP_201_CREATED,response_model=schemas.Stu)
-def addStudent(student: schemas.StudentBase, db: Session = Depends(get_db)):
-    new_post = models.Student(**student.dict())
-    print(new_post)
-    db.add(new_post)
-    db.commit()
-    db.refresh(new_post)
-    return {"data": new_post}
-
-
-@router.get("/loadstudent",response_model=List[schemas.Stu])
-def loadPosts(db: Session = Depends(get_db)):
-    posts = db.query(models.Student).all()
-    print(posts)
-    return posts
-
-
-@router.get("/loadstudent/{name}")
-def loadUser(name: str, db: Session = Depends(get_db)):
-    post = db.query(models.Student).filter(models.Student.name == name).first()
-    print(post)
-    return {"data": post}
-
-
-@router.delete("/deletestudent/{name}", status_code=status.HTTP_204_NO_CONTENT)
-def deleteStudent(name: str, db: Session = Depends(get_db)):
-    post = db.query(models.Student).filter(models.Student.name == name)
-    if post.first() == None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Given ID not found")
-    post.delete()
-    db.commit()
-    return {"message": "user deleted"}
-----
-
-from fastapi import FastAPI, HTTPException, Response,Depends
-from random import randrange
-from typing import Optional
-from fastapi.params import Body
-from sqlalchemy.orm import Session
-from fastapi import status
-import sqlite3
-from . import models,schemas
-from .database import engine,get_db
-from .routers import post
-
-models.Base.metadata.create_all(bind=engine)
-
-app = FastAPI()
-
-app.include_router(post.router)
-
-@app.post("/adduser", status_code=status.HTTP_201_CREATED,response_model=schemas.UserOut)
+@router.post("/adduser", status_code=status.HTTP_201_CREATED,response_model=schemas.UserOut)
 def addUser(user:schemas.UserCreate,db: Session=Depends(get_db)):
+    hashed_password=utils.hash(user.password)
+    user.password=hashed_password
     new_post=models.User(**user.dict())
     print(new_post)
     db.add(new_post)
@@ -106,8 +34,3 @@ def addUser(user:schemas.UserCreate,db: Session=Depends(get_db)):
     db.refresh(new_post)
     return new_post
     
-
-
-
-
-
