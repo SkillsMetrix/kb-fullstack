@@ -1,36 +1,55 @@
+var vm1=new Vue({
+    data:{
+        title:'The Vue Instance',
+        showPara: false
+    },
+    methods: {
+        show: function(){
+            this.showPara=true
+            this.updateTitle('this is new Instance (Updated)')
+        },
+        updateTitle: function(title){
+            return this.title=title
+        }
+    },
+    computed:{
+        lowerCaseTitle:function(){
+            return this.title.toLowerCase()
+        }
+    },
+    watch:{
+        title:function(value){
+         alert('Title Changed...! '+value)
+
+        }
+    }
+})
+vm1.$mount('#app')
 
 
+---------
 
-from passlib.context import CryptContext
-pwd_context=CryptContext(schemes=["bcrypt"],deprecated="auto")
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="vue.js"></script>
+</head>
 
+<body>
 
-def hash(password:str):
-    return pwd_context.hash(password)
+    <div id="app">
+        <h1>{{title}}</h1>
+        <h2>{{lowerCaseTitle}}</h2>
+        <button @click="show">Show Para</button>
+        <p v-if="showPara">This is not always visible</p>
+      
+    </div>
 
--------------
+  <script src="app.js"></script>
+</body>
 
-
-from fastapi import FastAPI, HTTPException, Response, Depends, status, APIRouter
-from sqlalchemy.orm import Session
- 
-from .. import models, schemas,utils
-from .. database import engine, get_db
-
-router = APIRouter(
-    tags=["users"]
-)
-
-
-@router.post("/adduser", status_code=status.HTTP_201_CREATED,response_model=schemas.UserOut)
-def addUser(user:schemas.UserCreate,db: Session=Depends(get_db)):
-    hashed_password=utils.hash(user.password)
-    user.password=hashed_password
-    new_post=models.User(**user.dict())
-    print(new_post)
-    db.add(new_post)
-    db.commit()
-    db.refresh(new_post)
-    return new_post
-    
+</html>
