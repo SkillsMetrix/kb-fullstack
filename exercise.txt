@@ -1,43 +1,67 @@
-var vm1=new Vue({
-    data:{
-        title:'The Vue Instance',
-        showPara: false
-    },
-    methods: {
-        show: function(){
-            this.showPara=true
-            this.updateTitle('this is new Instance (Updated)')
-        },
-        updateTitle: function(title){
-            return this.title=title
-        }
-    },
-    computed:{
-        lowerCaseTitle:function(){
-            return this.title.toLowerCase()
-        }
-    },
-    watch:{
-        title:function(value){
-         alert('Title Changed...! '+value)
+<template>
+  <div class="container">
+    <app-header></app-header>
+    <hr>
+    <div class="row">
+      <Servers></Servers>
+      <ServerDetails></ServerDetails>
+    </div>
+    <hr>
+    <Footer></Footer>
+  </div>
+  </template>
 
-        }
-    }
-})
-vm1.$mount('#app')
+<script>
+import Header from './components/shared/Header.vue'
+import Footer from './components/shared/Footer.vue'
+import Servers from './components/server/Servers.vue'
+import ServerDetails from './components/server/ServerDetails.vue'
 
-setTimeout(()=>{
-    vm1.title='changed by timer...!'
-},3000)
 
-var vm2=new Vue({
-    el:'#app2',
-    data:{
-        title:'this is another instance'
-    },
-    methods:{
-        onChange(){
-            vm1.title='changed by another instance'
-        }
-    }
-})
+export default {
+  components: {
+    appHeader:Header,
+    Footer,
+    Servers,
+    ServerDetails
+  }
+};
+</script>
+
+<style>
+#app {
+  text-align: center;
+  color: blue;
+  margin-top: 60px;
+}
+</style>
+-----
+
+<template>
+  <div class="col-xs-12 col-sm-6">
+    <ul class="list-group">
+      <li class="list-group-item" v-for="index in 5">#Server {{ index }}</li>
+    </ul>
+  </div>
+</template>
+
+<style>
+div {
+  border: 1px solid blue;
+}
+</style>
+
+
+--------------
+
+<template>
+    <div>
+        <p>Server details are currently not updated</p>
+    </div>
+</template>
+
+<style>
+div{
+    border: 1px solid red;
+}
+</style>
