@@ -1,24 +1,3 @@
-import {ref} from "vue";
-import axios from "axios";
-
-export default function useStudent() {
-  const url = "http://localhost:3000/students";
-  //get students data
-
-  const getAllStudents = async () => {
-    try {
-      const res = await axios(url);
-      console.log(res);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  return { getAllStudents }
-}
-
----------------
-
-
 <template>
   <div>
     <div class="bg-orange-600 p-4 grid grid-cols-9">
@@ -48,10 +27,10 @@ export default function useStudent() {
         </tr>
       </thead>
       <tbody class="text-center">
-        <tr>
-          <td class="py-2">1</td>
-          <td class="py-2">Admin</td>
-          <td class="py-2">admin@mail.com</td>
+        <tr v-for="({ id, stuname, email }, i) in studentData" :key="id">
+          <td class="py-2">{{ ++i }}</td>
+          <td class="py-2">{{ stuname }}</td>
+          <td class="py-2">{{ email }}</td>
           <td class="py-2">
             <RouterLink :to="{ name: 'view', params: { id: 1 } }">
               <EyeIcon class="text-blue-500 h-6 w-6 inline" />
@@ -81,7 +60,7 @@ import { RouterLink } from "vue-router";
 import useStudent from "../../composables/studentApi";
 import { onMounted } from "vue";
 
-const { getAllStudents } = useStudent();
+const { getAllStudents, studentData } = useStudent();
 onMounted(getAllStudents);
 
 const deleteStudents = async (id) => {
