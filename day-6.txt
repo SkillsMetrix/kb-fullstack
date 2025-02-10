@@ -8,6 +8,26 @@
             </h1>
         </div>
     </div>
+
+    <table class="table-auto w-full">
+        <thead class="bg-slate-600 text-white">
+            <tr>
+                <th class="py-1">No</th>
+                <th class="py-1">Name</th>
+                <th class="py-1">Email</th>
+                <th class="py-1">Action</th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            <tr>
+                <td class="py-2">1</td>
+                <td class="py-2">Admin</td>
+                <td class="py-2">admin@mail.com</td>
+                <td class="py-2">View Edit Delete</td>
+            </tr>
+
+        </tbody>
+    </table>
   </div>
 </template>
 
