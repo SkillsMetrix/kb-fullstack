@@ -23,9 +23,9 @@
           <td class="py-2">Admin</td>
           <td class="py-2">admin@mail.com</td>
           <td class="py-2">
-            <EyeIcon class="text-blue-500 h-6 w-6" />
-            <PencilIcon class="text-emerald-500 h-6 mx-6" />
-            <TrashIcon class="text-red h-6 w-6" />
+            <EyeIcon class="text-blue-500 h-6 w-6 inline" />
+            <PencilIcon class="text-emerald-500 h-6 mx-6 inline" />
+            <TrashIcon class="text-red h-6 w-6 inline" />
           </td>
         </tr>
       </tbody>
@@ -40,7 +40,14 @@ import {
   TrashIcon,
   UserPlusIcon,
 } from "@heroicons/vue/24/solid";
-export default {};
+export default {
+  components: {
+    EyeIcon,
+    PencilIcon,
+    TrashIcon,
+    UserPlusIcon,
+  },
+};
 </script>
 
 <style scoped></style>
