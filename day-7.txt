@@ -10,20 +10,20 @@
 </head>
 
 <body>
-    <form>
+    <form action="{% url 'submit' %}" >
         <div class="container">
             <div class="form-group">
                 <label for="exampleInputEmail1">Title</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                <input type="text" class="form-control" id="title" name="title" aria-describedby="emailHelp"
                     placeholder="Enter Title">
             </div>
             <div class="form-group">
                 <label for="exampleInputPassword1">Description</label>
-                <input type="text" class="form-control" id="exampleInputPassword1" placeholder="Enter Description">
+                <input type="text" class="form-control" id="description" name="description" placeholder="Enter Description">
             </div>
             <div class="form-group">
                 <label for="exampleInputPassword1">Priority</label>
-                <input type="number" class="form-control" id="exampleInputPassword1" placeholder="Enter Priority">
+                <input type="number" class="form-control" id="priority" name="priority" placeholder="Enter Priority">
             </div>
 
             <button type="submit" class="btn btn-primary">Add</button>
@@ -32,3 +32,32 @@
 </body>
 
 </html>
+
+------------
+
+
+from django.urls import path
+from . import views
+
+urlpatterns=[
+    path('',views.index,name='index'),
+    path('submit',views.submit,name='submit')
+]
+
+
+--------------
+
+from django.shortcuts import render
+from .models import *
+from django.http import HttpResponse,JsonResponse
+
+def index(request):
+    return render(request,'index.html')
+
+def submit(request):
+    obj= Todo()
+    obj.title= request.GET['title']
+    obj.description= request.GET['description']
+    obj.priority= request.GET['priority']
+    obj.save()
+    return render(request,'index.html')
