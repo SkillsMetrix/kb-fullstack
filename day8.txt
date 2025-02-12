@@ -1,50 +1,45 @@
-import { ref } from "vue";
-import axios from "axios";
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import List, Optional
 
-export default function studentCalls() {
-  const url = "http://localhost:8000/app/student/";
-  const studentData = ref([]);
+app = FastAPI()
 
-  const error = ref(null);
-  const getAllStudents = async () => {
-    studentData.value = [];
-    error.value = null;
-    try {
-      const res = await axios(url);
-      console.log(res.data);
-    } catch (err) {
-      console.log(err);
-      error.value = err;
-    }
-  };
-  return {
-    studentData,
-    error,
-    getAllStudents,
-  };
-}
----
-  <template>
-  <div>
-    <h1>Student Data</h1>
-    <div v-if="error">OOPS....Something went wrong...!{{ error.message }}</div>
-    <div v-else-if="studentData">
-      <div v-for="({ id, name, email }, i) in studentData" :key="id">
-        <h2>
-          {{ ++i }}
-          {{ name }}
-          {{ email }}
-        </h2>
-      </div>
-    </div>
-  </div>
-</template>
+class Todo(BaseModel):
+    name: str
+    completed: bool
 
-<script setup>
-import { onMounted } from "vue";
-import studentCalls from "../composables/studentAPI";
-const { getAllStudents, error, studentData } = studentCalls();
-onMounted(getAllStudents);
-</script>
+# Mock database
+todos = {}
 
-<style scoped></style>
+@app.get("/", response_model=List[Todo])
+async def read_todos():
+    return list(todos.values())
+
+@app.post("/", response_model=Todo)
+async def create_todo(todo: Todo):
+    todo_id = str(len(todos) + 1)
+    todos[todo_id] = todo
+    return todo
+
+@app.get("/{todo_id}", response_model=Todo)
+async def read_todo(todo_id: str):
+    todo = todos.get(todo_id)
+    if todo is None:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    return todo
+
+@app.put("/{todo_id}", response_model=Todo)
+async def update_todo(todo_id: str, updated_todo: Todo):
+    todo = todos.get(todo_id)
+    if todo is None:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    todos[todo_id] = updated_todo
+    return updated_todo
+
+@app.delete("/{todo_id}", response_model=Todo)
+async def delete_todo(todo_id: str):
+    todo = todos.get(todo_id)
+    if todo is None:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    del todos[todo_id]
+    return todo
