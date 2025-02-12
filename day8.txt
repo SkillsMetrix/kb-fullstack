@@ -1,0 +1,50 @@
+import { ref } from "vue";
+import axios from "axios";
+
+export default function studentCalls() {
+  const url = "http://localhost:8000/app/student/";
+  const studentData = ref([]);
+
+  const error = ref(null);
+  const getAllStudents = async () => {
+    studentData.value = [];
+    error.value = null;
+    try {
+      const res = await axios(url);
+      console.log(res.data);
+    } catch (err) {
+      console.log(err);
+      error.value = err;
+    }
+  };
+  return {
+    studentData,
+    error,
+    getAllStudents,
+  };
+}
+---
+  <template>
+  <div>
+    <h1>Student Data</h1>
+    <div v-if="error">OOPS....Something went wrong...!{{ error.message }}</div>
+    <div v-else-if="studentData">
+      <div v-for="({ id, name, email }, i) in studentData" :key="id">
+        <h2>
+          {{ ++i }}
+          {{ name }}
+          {{ email }}
+        </h2>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { onMounted } from "vue";
+import studentCalls from "../composables/studentAPI";
+const { getAllStudents, error, studentData } = studentCalls();
+onMounted(getAllStudents);
+</script>
+
+<style scoped></style>
